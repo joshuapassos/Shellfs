@@ -1,21 +1,48 @@
-#!/home/joshua/.dotnet/dotnet fsi
-//
+#r "paket:
+nuget Fake.DotNet.Cli
+nuget Fake.IO.FileSystem
+nuget Fake.Core.Target //"
 
-// #r "/usr/bin/Shell.dll"
-#r "/home/joshua/Documents/Codigos/Shell.fs/bin/Debug/net6.0/linux-x64/Shell.dll"
+#load ".fake/build.fsx/intellisense.fsx"
 
-// include Fake modules, see Fake modules section
+open Fake.Core
+open Fake.DotNet
+open Fake.IO
+open Fake.IO.FileSystemOperators
+open Fake.IO.Globbing.Operators
+open Fake.Core.TargetOperators
 
-open Shell
-// Target.create "Deploy" (fun _ ->
-//   Trace.log " --- Deploying app --- "
-// )
-
-// Target.runOrDefault "Deploy"
-
-stdout.WriteLine "Running ExecSync in silent mode"
-printfn "%A" (Shell.ExecSync ("ls", silent=true))
-stdout.WriteLine "Running ExecSync in verbose mode"
-printfn "%A" (Shell.ExecSync ("git sts"))
+Target.initEnvironment ()
 
 
+Target.create "Clean" (fun _ ->
+    !! "src/**/bin"
+    ++ "src/**/obj"
+    |> Shell.cleanDirs
+)
+
+Target.create "Build" (fun _ ->
+    !! "src/**/*.*proj"
+    |> Seq.iter (DotNet.build id)
+)
+
+Target.create "CleanTests" (fun _ ->
+    !! "tests/**/bin"
+    ++ "tests/**/obj"
+    |> Shell.cleanDirs
+)
+
+Target.create "BuildTests" (fun _ ->
+    !! "tests/**/*.*proj"
+    |> Seq.iter (DotNet.build id)
+)
+
+Target.create "All" ignore
+
+"Clean"
+  ==> "Build"
+  ==> "CleanTests"
+  ==> "BuildTests"
+  ==> "All"
+
+Target.runOrDefault "All"

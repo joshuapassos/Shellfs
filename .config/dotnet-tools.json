@@ -2,10 +2,10 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "fantomas-tool": {
-      "version": "4.6.0-alpha-004",
+    "fake-cli": {
+      "version": "5.20.4",
       "commands": [
-        "fantomas"
+        "fake"
       ]
     }
   }
