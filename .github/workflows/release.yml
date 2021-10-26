@@ -1,0 +1,20 @@
+name: Release
+on:
+  release:
+    types: [published]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    name: Build Project
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Install Dotnet Tools
+        run: dotnet tool restore
+      - name: Release Package
+        run: dotnet fake build -t Release
+        env:
+          NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+

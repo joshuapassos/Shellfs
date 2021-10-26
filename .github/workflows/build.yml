@@ -1,0 +1,22 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    name: Build Project
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Install Dotnet Tools
+        run: dotnet tool restore
+      - name: Build Package
+        run: dotnet fake build -t Build
+

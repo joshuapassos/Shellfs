@@ -1,4 +1,4 @@
-﻿module Shell
+﻿module Shellfs
 
 open System.Diagnostics
 open System
