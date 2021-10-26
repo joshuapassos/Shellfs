@@ -69,7 +69,7 @@ Target.create "NuGet" (fun _ ->
     |> Seq.iter (DotNet.nugetPush (fun opt ->
     opt.WithPushParams(
       { opt.PushParams with
-          ApiKey = Some (Environment.environVarOrFail "NUGET_APIKEY")
+          ApiKey = Some (Environment.environVarOrFail "NUGET_TOKEN")
           Source = Some "https://api.nuget.org/v3/index.json"
       })
       ))
