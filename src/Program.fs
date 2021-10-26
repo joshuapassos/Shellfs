@@ -66,7 +66,7 @@ module private Internal =
               StandardError = out.[1] }
             |> Ok
         with
-        | e -> return (Error $"Error: {e} {args.Cmd} ")
+        | e -> return (Error $"{e.Message}")
     }
 
 let inline private await (task: Task<_>) = task.Result
