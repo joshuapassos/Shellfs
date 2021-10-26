@@ -1,3 +1,4 @@
+open System.Text.RegularExpressions
 #r "paket:
 nuget Fake.DotNet.Cli
 nuget Fake.IO.FileSystem
@@ -13,6 +14,13 @@ open Fake.IO.Globbing.Operators
 open Fake.Core.TargetOperators
 
 Target.initEnvironment ()
+
+
+let (|ValidVersion|_|) input =
+    if Regex.IsMatch (input, "^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$") then
+        Some input
+    else
+        None
 
 Target.create "Clean" (fun _ ->
     !! "src/**/bin"
@@ -33,11 +41,26 @@ Target.create "Build" (fun _ ->
     |> Seq.iter runBuild
 )
 
+
+
 Target.create "NuGet" (fun _ ->
+    let version =
+        match (Environment.environVarOrFail "VERSION") with
+        | ValidVersion v -> v
+        | _ -> failwith "Invalid version format x.x.x"
+
+    let properties = [
+        ("Version", version)
+        ("Authors", "Joshua Passos")
+        ("PackageProjectUrl", "https://github.com/joshuapassos/Shellfs")
+        ("RepositoryUrl", "https://github.com/joshuapassos/Shellfs")
+        ("PackageLicenseExpression", "MIT")
+    ]
 
     let packConfiguration (defaults:DotNet.PackOptions) =
         { defaults with
             Configuration = DotNet.Release
+            MSBuildParams = { defaults.MSBuildParams with Properties = properties }
         }
     DotNet.pack packConfiguration "src/Shellfs.fsproj"
 
@@ -49,7 +72,7 @@ Target.create "NuGet" (fun _ ->
           ApiKey = Some (Environment.environVarOrFail "NUGET_APIKEY")
           Source = Some "https://api.nuget.org/v3/index.json"
       })
-  ))
+      ))
 )
 
 Target.create "All" ignore

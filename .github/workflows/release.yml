@@ -18,4 +18,5 @@ jobs:
         run: dotnet fake build -t Release
         env:
           NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+          VERSION: $(echo \"${{ github.ref }}\" | cut -d'/' -f3)
 
