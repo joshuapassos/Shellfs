@@ -12,11 +12,12 @@ jobs:
         with:
           dotnet-version: 6.0.x
           include-prerelease: true
+      - name: Add version env
+        run: echo 'VERSION='$(echo \"${{ github.ref }}\" | cut -d'/' -f3) >> $GITHUB_ENV
       - name: Install Dotnet Tools
         run: dotnet tool restore
       - name: Release Package
         run: dotnet fake build -t Release
         env:
           NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
-          VERSION: $(echo \"${{ github.ref }}\" | cut -d'/' -f3)
 
